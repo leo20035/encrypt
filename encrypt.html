@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES 加解密工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+        }
+        .btn-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            word-wrap: break-word;
+        }
+        #output {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .error {
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>AES 加解密工具</h2>
+
+    <div class="form-group">
+        <label for="key">金鑰 (KEY)</label>
+        <input type="text" id="key" placeholder="請輸入金鑰">
+    </div>
+
+    <div class="form-group">
+        <label for="value">明文 (VALUE)</label>
+        <textarea id="value" rows="4" placeholder="請輸入要加密的內容"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="ciphertext">密文 (Ciphertext)</label>
+        <textarea id="ciphertext" rows="4" placeholder="請輸入要解密的內容"></textarea>
+    </div>
+
+    <div class="btn-group">
+        <button id="encryptBtn">加密</button>
+        <button id="decryptBtn">解密</button>
+    </div>
+
+    <div id="result">
+        <p><strong>操作結果:</strong></p>
+        <pre><code id="output"></code></pre>
+    </div>
+</div>
+
+<script src="crypto-js.min.js"></script>
+<script src="jquery.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    // 加密按鈕點擊事件
+    $('#encryptBtn').click(function(){
+        var key = $('#key').val();
+        var value = $('#value').val();
+
+        if (key && value) {
+            try {
+                var encrypted = CryptoJS.AES.encrypt(value, key).toString();
+                $('#ciphertext').val(encrypted);
+                $('#output').text(encrypted).removeClass('error');
+            } catch (e) {
+                $('#output').text('加密失敗: ' + e.message).addClass('error');
+            }
+        } else {
+            $('#output').text('金鑰和明文不可為空').addClass('error');
+        }
+    });
+
+    // 解密按鈕點擊事件
+    $('#decryptBtn').click(function(){
+        var key = $('#key').val();
+        var ciphertext = $('#ciphertext').val();
+
+        if (key && ciphertext) {
+            try {
+                var bytes  = CryptoJS.AES.decrypt(ciphertext, key);
+                var originalText = bytes.toString(CryptoJS.enc.Utf8);
+
+                if (originalText) {
+                    $('#value').val(originalText);
+                    $('#output').text(originalText).removeClass('error');
+                } else {
+                    throw new Error('金鑰或密文不正確');
+                }
+            } catch (e) {
+                $('#output').text('解密失敗，請確認金鑰和密文是否正確。').addClass('error');
+            }
+        } else {
+            $('#output').text('金鑰和密文不可為空').addClass('error');
+        }
+    });
+});
+</script>
+
+</body>
+</html>
